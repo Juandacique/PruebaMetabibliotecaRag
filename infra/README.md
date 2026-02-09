@@ -1,4 +1,4 @@
-# Infraestructura – DocFlow RAG
+# Infraestructura 
 
 Esta carpeta contiene los archivos necesarios para el despliegue de la infraestructura del sistema **DocFlow**, utilizada para la ingesta, vectorización y consulta de documentos PDF mediante un enfoque RAG.
 
@@ -41,11 +41,7 @@ El archivo `docker-compose.yml` define los siguientes servicios:
 
 ## Variables de entorno
 
-El archivo `.env.example` contiene las variables necesarias para el despliegue del sistema.
-
-⚠️ **Nota de seguridad**  
-El archivo `.env` real **no debe subirse al repositorio**, ya que contiene credenciales sensibles.
-
+El archivo `.env.example` contiene un ejemplo de las variables necesarias para el despliegue del sistema.
 Ejemplo de variables definidas:
 
 ```env
