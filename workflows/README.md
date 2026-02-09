@@ -1,6 +1,6 @@
 # Workflows 
 
-Esta carpeta contiene los flujos de trabajo exportados desde **n8n**, los cuales implementan la lógica principal del sistema **DocFlow** para la ingesta documental y la consulta RAG.
+Esta carpeta contiene los flujos de trabajo exportados desde **n8n**, los cuales implementan la lógica principal del sistema para la ingesta documental y la consulta RAG.
 
 Cada flujo está diseñado para cumplir una función específica dentro del sistema y puede ejecutarse de forma independiente.
 
@@ -135,15 +135,6 @@ Este flujo implementa la lógica de recuperación de contexto y generación de r
 - **Modelo:** OpenAI GPT-4.1 Mini  
 
 La selección del modelo se basa en su equilibrio entre capacidad de razonamiento, estabilidad y costo computacional.
-
----
-
-### Consideraciones generales sobre los workflows
-
-- Los flujos están desacoplados por responsabilidad
-- Permiten ejecución independiente
-- Facilitan la depuración y el mantenimiento
-- Son fácilmente extensibles a nuevos tipos de documentos o modelos
 
 ---
 
