@@ -167,7 +167,7 @@ La infraestructura se despliega mediante **Docker Compose** e incluye los siguie
 - Qdrant  
 - Servicios auxiliares necesarios para el flujo  
 
-##10. Decisiones técnicas relevantes
+## 10. Decisiones técnicas relevantes
 
 - Uso de una sola colección en Qdrant para mejorar escalabilidad
 
@@ -179,7 +179,7 @@ La infraestructura se despliega mediante **Docker Compose** e incluye los siguie
 
 - Orquestación completa del sistema mediante flujos en n8n
 
-##11. Contenido del repositorio
+## 11. Contenido del repositorio
 /infra      – Infraestructura y despliegue
 /workflows  – Flujos exportados de n8n
 /frontend   – Evidencia de la interfaz
