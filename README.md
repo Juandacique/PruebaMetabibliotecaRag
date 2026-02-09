@@ -96,7 +96,7 @@ Cada fragmento se almacena con la siguiente metadata:
   "author": "Autor (si existe)",
   "creation_date": "Fecha del documento",
 }
-
+```
 ## 6. Flujo 2 – Chat RAG sobre documentos
 
 ### Objetivo
