@@ -1,4 +1,4 @@
-# Workflows – DocFlow RAG
+# Workflows 
 
 Esta carpeta contiene los flujos de trabajo exportados desde **n8n**, los cuales implementan la lógica principal del sistema **DocFlow** para la ingesta documental y la consulta RAG.
 
