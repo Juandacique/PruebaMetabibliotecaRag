@@ -7,8 +7,8 @@ Un sistema de información basado en la arquitectura **RAG (Retrieval-Augmented 
 El sistema está diseñado para trabajar con documentos académicos, tesis, artículos científicos y documentos técnicos disponibles en Internet, garantizando que las respuestas generadas se basen exclusivamente en el contenido del documento consultado.
 
 ## Enlaces sistemas publicados:
-# N8N: https://n8n-prueba4.metadatos.org/
-# Front: https://ragmetabiblioteca.lovable.app/
+### N8N: https://n8n-prueba4.metadatos.org/
+### Front: https://ragmetabiblioteca.lovable.app/
 
 
 ---
