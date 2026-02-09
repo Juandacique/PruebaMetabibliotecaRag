@@ -1,8 +1,8 @@
-# 📄 DocFlow – Sistema RAG para Conversación con Documentos PDF
+# 📄 Sistema RAG para Conversación con Documentos PDF
 
 ## 1. Descripción general
 
-**DocFlow** es un sistema de información basado en la arquitectura **RAG (Retrieval-Augmented Generation)** que permite **ingerir documentos PDF desde URLs públicas** y **conversar con su contenido** mediante un asistente inteligente.
+Un sistema de información basado en la arquitectura **RAG (Retrieval-Augmented Generation)** que permite **ingerir documentos PDF desde URLs públicas** y **conversar con su contenido** mediante un asistente inteligente.
 
 El sistema está diseñado para trabajar con documentos académicos, tesis, artículos científicos y documentos técnicos disponibles en Internet, garantizando que las respuestas generadas se basen exclusivamente en el contenido del documento consultado.
 
