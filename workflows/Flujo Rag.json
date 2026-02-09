@@ -1,0 +1,731 @@
+{
+  "name": "Flujo Rag",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "rag5",
+          "mode": "list",
+          "cachedResultName": "rag5"
+        },
+        "embeddingBatchSize": 100,
+        "options": {
+          "contentPayloadKey": "text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        2384,
+        96
+      ],
+      "id": "00d7bdf7-c881-4650-ad7c-90d2f55db845",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "dA5rVHxp1rhXRChG",
+          "name": "Cuenta en la nube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "type": "SHA256",
+        "value": "={{ $json.pdf_url_normalized }}"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        208
+      ],
+      "id": "e19d8a95-fb1b-46e7-b5e7-47b1af7b4cd4",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "debcc5a3-1490-4d16-92ab-cfd38991795c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1344,
+        176
+      ],
+      "id": "45a6b15d-2407-4502-baab-3caef4cbbbab",
+      "name": "Webhook",
+      "webhookId": "debcc5a3-1490-4d16-92ab-cfd38991795c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b1f345f-d866-435d-8202-64fcbd24b605",
+              "name": "pdf_url",
+              "value": "https://www.memoria.fahce.unlp.edu.ar/tesis/te.2672/te.2672.pdf",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        496
+      ],
+      "id": "36a69ced-256a-405b-aed6-c96a4eecf33c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec2b9e34-61a3-4d79-8bb9-86d4576b261a",
+              "name": "doc_id",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        272
+      ],
+      "id": "0e00043e-bff3-4ba2-b6e3-08490bc8c730",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "pdfLoader",
+        "textSplittingMode": "custom",
+        "options": {
+          "splitPages": true,
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "doc_id",
+                "value": "={{ $('Edit Fields1').item.json.doc_id }}"
+              },
+              {
+                "name": "source_url",
+                "value": "={{ $('Extraccion de data1').item.json.pdf_url }}"
+              },
+              {
+                "name": "file_name",
+                "value": "={{ $('Extraccion de data1').item.json.file_name }}"
+              },
+              {
+                "name": "fecha_ingested",
+                "value": "={{ $('Extraccion de data1').item.json.ingested_at }}"
+              },
+              {
+                "name": "CreationDate",
+                "value": "={{ $json.info.CreationDate }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2624,
+        352
+      ],
+      "id": "d1bf9a72-4dcf-4dcc-a9cf-2723c8da2a14",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        336
+      ],
+      "id": "fe73aefa-a003-4707-b530-061c2d1edc97",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "6TD068TxY9ur3WKq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        512
+      ],
+      "id": "6a2df11d-190f-41e4-957d-f31477ec928b",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://7b4713c0-57e4-4fc8-a9e7-2c4e9c15889d.europe-west3-0.gcp.cloud.qdrant.io/collections/rag5/points/delete",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "api-key",
+              "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIiwiZXhwIjoyMDg1OTYwMjE5fQ.JpQJ6XSIao045CdDgdMAtO-apNDJQ_9Zdo6hk3zLZVY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"wait\": true,\n  \"filter\": {\n    \"must\": [\n      {\n        \"key\": \"metadata.doc_id\",\n        \"match\": {\n          \"value\": \"{{$json.doc_id}}\"\n        }\n      }\n    ]\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        272
+      ],
+      "id": "5c261252-728c-49dc-a990-3577e8d5b4ed",
+      "name": "Delete Points"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        512
+      ],
+      "id": "e4c27eab-6cbc-4872-96bd-b23199a0bf0f",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "C8liWL1j7CjX9244",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const pdf_url = ($json.pdf_url || '').trim();\nif (!pdf_url) throw new Error('Falta pdf_url');\n\nconst clean_url = pdf_url.split('#')[0];\nconst file_name = clean_url.split('?')[0].split('/').pop() || 'document.pdf';\n\nreturn [{\n  pdf_url: clean_url,\n  file_name,\n  ingested_at: new Date().toISOString(),\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        512
+      ],
+      "id": "0e4656f7-9ae8-4c81-bef6-5d517db4d4b5",
+      "name": "Extraccion de data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = ($json.pdf_url || '').trim();\n\n// elimina fragmentos y query params\nconst normalized = raw\n  .split('#')[0]\n  .split('?')[0]\n  .toLowerCase();\n\nreturn [{\n  pdf_url_raw: raw,\n  pdf_url_normalized: normalized,\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        208
+      ],
+      "id": "66beb36b-7a81-41b0-af7f-344f2219381a",
+      "name": "normalizacion url"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Extraccion de data1').item.json.pdf_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1024,
+        240
+      ],
+      "id": "1b6259a8-7926-45e0-b067-923d82c8511b",
+      "name": "Data PDF"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Leer pdf_url desde el body del webhook\nconst pdf_url = ($json.body?.pdf_url || '').trim();\n\nif (!pdf_url) {\n  throw new Error('Falta pdf_url en el body del webhook');\n}\n\n// 2. Limpiar la URL (quitar anchors, queries raras)\nconst clean_url = pdf_url.split('#')[0];\n\n// 3. Obtener nombre de archivo\nconst file_name =\n  clean_url.split('?')[0].split('/').pop() || 'documento.pdf';\n\n// 4. Retornar estructura estándar\nreturn [{\n  pdf_url: clean_url,\n  file_name,\n  ingested_at: new Date().toISOString(),\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        208
+      ],
+      "id": "125fe076-dda0-4dec-9877-625cc4d5e823",
+      "name": "Extraccion de data1"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "efb2a53c-c590-4eed-8bdd-62550964c57d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lee texto y metadata \"info\" del nodo Extract PDF\nconst text = ($json.text || \"\").toString();\nconst info = $json.info || {};\n\n// Helpers\nfunction clean(s) {\n  return (s || \"\")\n    .toString()\n    .replace(/\\s+/g, \" \")\n    .replace(/\\u0000/g, \"\")\n    .trim();\n}\n\nfunction pickFirstMatch(regex, str) {\n  const m = str.match(regex);\n  return m ? clean(m[1]) : \"\";\n}\n\n// 1) Autor (primero desde info, luego desde el texto)\nlet author =\n  clean(info.Author) ||\n  pickFirstMatch(/Autor(?:a)?\\s*:\\s*([^\\n\\r]{2,120})/i, text) ||\n  pickFirstMatch(/Autora?\\s+([A-ZÁÉÍÓÚÑ][^\\n\\r]{2,120})/i, text) ||\n  pickFirstMatch(/Tesis\\s+presentada\\s+por\\s+([A-ZÁÉÍÓÚÑ][^\\n\\r]{2,120})/i, text) ||\n  pickFirstMatch(/Directora?\\s*:\\s*([^\\n\\r]{2,120})/i, text); // fallback por si no hay autor claro\n\n// 2) Fecha (desde info.CreationDate si existe; si no, busca fecha en el texto)\nlet dateRaw = clean(info.CreationDate) || \"\";\n// Quitar prefijo típico \"D:20240202085303-03'00'\"\nlet creationDate = \"\";\nif (dateRaw.startsWith(\"D:\")) {\n  // D:YYYYMMDDHHmmSS...\n  const y = dateRaw.slice(2, 6);\n  const m = dateRaw.slice(6, 8);\n  const d = dateRaw.slice(8, 10);\n  if (y && m && d) creationDate = `${y}-${m}-${d}`;\n}\n\n// Si no hay creationDate, intenta extraer en el texto (ej: \"31 de Julio de 2023\", \"2023\", etc.)\nif (!creationDate) {\n  const fullDate = pickFirstMatch(\n    /(\\d{1,2}\\s+de\\s+[A-Za-zÁÉÍÓÚÑáéíóúñ]+\\s+de\\s+\\d{4})/,\n    text\n  );\n  const yearOnly = pickFirstMatch(/(?:\\b|^)(20\\d{2})(?:\\b|$)/, text);\n\n  creationDate = fullDate || yearOnly || \"\";\n}\n\n// 3) Palabras clave (si existe una sección explícita)\nlet keywordsLine =\n  pickFirstMatch(/Palabras\\s+clave\\s*:\\s*([^\\n\\r]{2,300})/i, text) ||\n  pickFirstMatch(/Keywords?\\s*:\\s*([^\\n\\r]{2,300})/i, text);\n\n// Convertir keywords a array (separa por coma, punto y coma, guion)\nlet keywords = [];\nif (keywordsLine) {\n  keywords = keywordsLine\n    .split(/[,;•\\u2022\\-]+/)\n    .map(k => clean(k))\n    .filter(k => k.length > 1)\n    .slice(0, 20);\n}\n\n// Si no hay keywords explícitas, deja vacío (mejor que inventar)\nconst metadata = {\n  author: author || null,\n  date: creationDate || null,\n  keywords: keywords.length ? keywords : null,\n  // Opcional: guardar también cosas útiles\n  pdf_version: clean(info.PDFFormatVersion) || null,\n  producer: clean(info.Producer) || null,\n};\n\nreturn [\n  {\n    ...$json,\n    extracted_metadata: metadata,\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        432
+      ],
+      "id": "c812f631-1b06-419d-af96-dd8b9f205f2e",
+      "name": "Construccion Metadata"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Extraccion de data1').item.json.pdf_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1456,
+        208
+      ],
+      "id": "ff48b054-6aaa-48b6-be69-de3e1b8e68bd",
+      "name": "Data PDF1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9f40c02-0a67-4955-ad98-1eed46610187",
+              "name": "doc_id",
+              "value": "={{ $('Edit Fields1').item.json.doc_id }}",
+              "type": "string"
+            },
+            {
+              "id": "eaecdf5a-4c6f-49b0-9d32-9045471bf985",
+              "name": "metadata.source_url",
+              "value": "={{ $('Extraccion de data1').item.json.pdf_url }}",
+              "type": "string"
+            },
+            {
+              "id": "b98d50ed-947b-41cd-b0ec-b5ef547cd2f5",
+              "name": "metadata.file_name",
+              "value": "={{ $('Extraccion de data1').item.json.file_name }}",
+              "type": "string"
+            },
+            {
+              "id": "d3fcf163-779b-4a77-9e2b-e02099281cbe",
+              "name": "metadata.CreationDate",
+              "value": "={{ $('Extraccion de data1').item.json.ingested_at }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3216,
+        112
+      ],
+      "id": "b35a3214-470c-442b-b8f3-ccada2f94357",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "Fki7GYSiwYjmflaH",
+          "mode": "list",
+          "cachedResultName": "Almacenamiento de cargue de archivos",
+          "cachedResultUrl": "/projects/BcCmn67R1upFVyWF/datatables/Fki7GYSiwYjmflaH"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "doc_id": "={{ $json.doc_id }}",
+            "fecha": "={{ $json.metadata.CreationDate }}",
+            "file_name": "={{ $json.metadata.file_name }}",
+            "url_doc": "={{ $json.metadata.source_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "doc_id",
+              "displayName": "doc_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "url_doc",
+              "displayName": "url_doc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3536,
+        112
+      ],
+      "id": "692df97d-7182-425f-9a6b-d236ff7ea0ed",
+      "name": "Guardar Datos Almacenamiento",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "content": "#Recepcion de URL y procesamiento inicial\n** En esta etapa se recibe la URL, se extraen y se organizan los datos como URL y nombre del archivo",
+        "height": 800,
+        "width": 1328,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1488,
+        16
+      ],
+      "typeVersion": 1,
+      "id": "af84db56-8a4c-4855-8c64-45ac0edd5c25",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Limpieza de points repetidos\n### Se toma el doc_id y si existe vectores creados con el mismo ID, osea el mismo docuemtno, se eliminan los puntos para evitar redundancia de informacion.\n",
+        "height": 608,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "cb052064-5726-4ff7-a3db-30bd5e242ad3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Formato file del archivo y extracción de metadata\n### Apartir de la URL se descarga el archivo y se extrae la metadata asociada al archivo.\n",
+        "height": 976,
+        "width": 1200,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "72b47452-edd0-4f3d-930d-0209050ee4bb",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Vectorización de la data \n### Con la conifiguración establecida se generan la vectorización y creación de los points.",
+        "height": 896,
+        "width": 912,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2096,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "6e7d2ef7-9264-443b-9805-f6de8b955692",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Ejemplo de guardado post vectorización\n### se guarda los datos importantes para llevar un informe u orden de la data que se vectoriza.",
+        "height": 512,
+        "width": 688,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3120,
+        -32
+      ],
+      "typeVersion": 1,
+      "id": "a22ac0b4-938f-4ceb-a4fa-03a60289b639",
+      "name": "Sticky Note4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Extraccion de data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Delete Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Points": {
+      "main": [
+        [
+          {
+            "node": "Data PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        []
+      ]
+    },
+    "Extraccion de data": {
+      "main": [
+        []
+      ]
+    },
+    "normalizacion url": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extraccion de data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraccion de data1": {
+      "main": [
+        [
+          {
+            "node": "normalizacion url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Data PDF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construccion Metadata": {
+      "main": [
+        []
+      ]
+    },
+    "Data PDF1": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Guardar Datos Almacenamiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5164669e-9c82-41da-8ac5-92434cf30644",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c4cece998e9e65df871e9887a0d1886415f7d976fc1a5fce87c17a8d4e2705b1"
+  },
+  "id": "48avXTTgTPjaBFA7",
+  "tags": []
+}

@@ -1,0 +1,254 @@
+{
+  "name": "Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "3402ce35-e561-43a8-b080-8909440ca88d",
+      "name": "When chat message received",
+      "webhookId": "66607c1d-6e62-4455-9615-f40d8fa61f1a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "# Rol\nEres un agente experto en recuperación de información desde una base vectorial. Estás conectado a Qdrant, una herramienta que te permite acceder a documentos PDF previamente cargados en la base de datos. Tu formación está centrada en el uso preciso y riguroso de información indexada, evitando cualquier tipo de invención o suposición. Estás entrenado para responder en un español neutro, claro, ordenado y sin modismos regionales.\n\n# Tarea\nTu tarea es recibir enlaces de documentos PDF ya cargados en la base vectorial, realizar consultas a esa fuente específica utilizando la herramienta Qdrant, y entregar respuestas precisas basadas exclusivamente en el contenido indexado. Siempre debes:\n- Solicitar al inicio el enlace del PDF que el usuario desea consultar.\n- Usar únicamente la información proveniente del documento correspondiente.\n- Entregar respuestas estructuradas y claras.\n- Finalizar cada respuesta con una llamada a la acción para continuar o consultar otro documento.\n\n# Detalles Específicos\n- No debes inventar información: todas las respuestas deben estar respaldadas por contenido real recuperado desde la base vectorial.\n- Si el enlace no se ha proporcionado, solicítalo antes de cualquier otra acción.\n- Usa lenguaje claro, sin jergas ni expresiones regionales.\n- Organiza las respuestas en listas o párrafos bien estructurados según corresponda.\n- Al final de cada respuesta, incluye una invitación como: “¿Quieres hacer otra consulta? O si deseas, puedes compartir otro enlace y lo revisamos.”\n\n# Contexto\nTrabajas para METABIBLIOTECA, una empresa que se encarga de la Automatización de unidades de informacion.\n\n# Ejemplos\n\n**Ejemplo 1: Inicio de conversación**\nUsuario: Hola, quiero saber qué dice el documento sobre políticas de privacidad.  \nIA: Claro, ¿podrías compartir el enlace del PDF que deseas consultar? Una vez lo tenga, realizaré la búsqueda y te daré una respuesta precisa basada en el contenido del documento.\n\n**Ejemplo 2: Consulta con enlace proporcionado**\nUsuario: Este es el enlace del PDF. ¿Qué dice sobre las cláusulas legales?  \nIA: Perfecto. Ya que tengo el enlace, procederé a buscar la información solicitada...\n\n[Después de procesar]\n\n**Respuesta**:\nSegún el documento, las cláusulas legales incluyen:\n- Protección de datos conforme a la ley vigente.\n- Responsabilidad del proveedor frente al mal uso de los datos.\n- Condiciones para la modificación de términos.\n\n¿Quieres hacer otra consulta? O si deseas, puedes compartir otro enlace y lo revisamos.\n\n# Notas\n- No inicies ninguna búsqueda si no tienes primero el enlace al PDF.\n- No uses palabras o expresiones con tono argentino.\n- Las respuestas siempre deben ser neutras, profesionales y bien organizadas.\n- No realices suposiciones si la información no está disponible en el documento.\n- Siempre cierra con una invitación clara a seguir consultando o enviar otro enlace.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        256
+      ],
+      "id": "cfc271a3-8742-403a-8817-389aaa126af0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Busca la informacion con la mayor precision en la base vectorial",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "rag5",
+          "mode": "list",
+          "cachedResultName": "rag5"
+        },
+        "topK": 20,
+        "options": {
+          "contentPayloadKey": "text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        720,
+        480
+      ],
+      "id": "cd8b7cb8-a8ca-49bb-a722-60d26f2c2016",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "dA5rVHxp1rhXRChG",
+          "name": "Cuenta en la nube"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        496
+      ],
+      "id": "871c9b57-4dab-49a6-a01d-e87d878d3537",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "CqeMv6rb59wxdmma",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        512
+      ],
+      "id": "63af0a98-8630-4e45-bbf6-676d124a1537",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        560
+      ],
+      "id": "a0bcb558-8df2-48da-b008-3c7e72c014f7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "6TD068TxY9ur3WKq",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        720
+      ],
+      "id": "1f83c592-a647-46a9-a348-af24fc2a8c0a",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "C8liWL1j7CjX9244",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        672
+      ],
+      "id": "f836cc34-bd94-4ba8-bec0-9c972cde23ae",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "6TD068TxY9ur3WKq",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When chat message received": [
+      {
+        "json": {
+          "chatInput": "Para iniciar el titulo y autores de la tesis",
+          "sessionId": "lovable-session"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        []
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8656e5e3-cc56-4aeb-a9d3-67678fe9543f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c4cece998e9e65df871e9887a0d1886415f7d976fc1a5fce87c17a8d4e2705b1"
+  },
+  "id": "03JGU8uz6ss9IsQ3",
+  "tags": []
+}
